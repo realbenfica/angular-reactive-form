@@ -16,6 +16,8 @@ export class AppComponent implements OnInit {
     ngOnInit() {
         this.signupForm = new FormGroup({
             'userData': new FormGroup({
+                // BINDING IS NEEDED AS THIS WAS USED INSIDE THE CREATED VALIDATOR
+                // DO NOT EXECUTE VALIDATORS, ONLY PASS THE REFERENCE TO THE METHOD
                 'username': new FormControl('Panda', [Validators.required, this.forbiddenNames.bind(this)]),
                 'email': new FormControl('Bear ', [Validators.required, Validators.email], this.forbiddenEmails),
             }),
@@ -53,12 +55,15 @@ export class AppComponent implements OnInit {
         this.signupForm.reset();
     }
 
+    // SENDS HOBBY TO FORM
     onAddHobby() {
         const control = new FormControl(null, Validators.required);
         (<FormArray>this.signupForm.get('hobbies')).push(control);
     }
 
+    // VALIDATOR FOR NAMES (THESE CAN BE PUT IN ANOTHER FILE-PREFIX METHOD WITH 'STATIC')
     forbiddenNames(control: FormControl): {[s: string]: boolean} {
+        // THIS INDEXOF IS TO CHECK AGAINST NAMES IN THE ARRAY
         if (this.forbiddenUsernames.indexOf(control.value) !== -1) {
             return {'nameIsForbidden': true};
         } else {
@@ -66,6 +71,7 @@ export class AppComponent implements OnInit {
         }
     }
 
+    // ASYNC VALIDATOR MUST BE A THIRD ARGUMENT IN THE FORMCONTROL
     forbiddenEmails(control: FormControl): Promise<any> | Observable<any> {
         const promise = new Promise<any>((resolve, reject) => {
             setTimeout(() => {
